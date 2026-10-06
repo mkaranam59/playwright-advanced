@@ -29,6 +29,9 @@ jobs:
 
       - name: Run Playwright tests        # (9) the actual tests
         run: npx playwright test
+        env:
+          SAUCE_USER: ${{ vars.SAUCE_USER }}
+          SAUCE_PASSWORD: ${{ secrets.SAUCE_PASSWORD }}
 
       - name: Save the HTML report        # (10) keep the report as a downloadable file
         uses: actions/upload-artifact@v7
