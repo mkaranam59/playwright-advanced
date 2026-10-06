@@ -1,0 +1,39 @@
+# (1) Name shown in the Actions tab
+name: Playwright Tests
+
+# (2) WHEN: run on pushes to main and on pull requests into main
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:                                   # (3) A job called "test"
+    timeout-minutes: 30                   #     give up if it hangs for 30 minutes
+    runs-on: ubuntu-latest                # (4) WHERE: a fresh Linux machine
+    steps:
+      - name: Get the code                # (5) copy your repo onto the machine
+        uses: actions/checkout@v7
+
+      - name: Install Node.js             # (6) put Node on the machine
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies        # (7) install exactly what package-lock.json says
+        run: npm ci
+
+      - name: Install Playwright browser  # (8) download Chromium plus Linux libraries
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests        # (9) the actual tests
+        run: npx playwright test
+
+      - name: Save the HTML report        # (10) keep the report as a downloadable file
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}          #      even when tests failed
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
